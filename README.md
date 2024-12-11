@@ -1,188 +1,111 @@
-#include<iostream>
-#include<stdlib.h>
-#include<math.h>
-#include<graphics.h>
-//#include<dos.h>
-using namespace std;
-class Coordinate
-{
-public:
-int x,y;
-char code[4];
-};
-class Lineclip
-{
-public:
-Coordinate PT;
-void drawwindow(); -
-void drawline(Coordinate p1,Coordinate p2);
-Coordinate setcode(Coordinate p);
-int visibility(Coordinate p1,Coordinate p2);
-Coordinate resetendpt(Coordinate p1,Coordinate p2);
-};
-int main()
-{
-Lineclip lc;
-int gd = DETECT,v,gm;
-Coordinate p1,p2,p3,p4,ptemp;
+Write C++ program to draw a given pattern. Use DDA line and Bresenham’s circle drawing
+algorithm. Apply the concept of encapsulation.
 
-cout<<"\n Enter x1 and y1\n";
-cin>>p1.x>>p1.y;
-cout<<"\n Enter x2 and y2\n";
 
-cin>>p2.x>>p2.y;
 
-initgraph(&gd,&gm,"");
-lc.drawwindow();
-delay(2000);
-
-lc.drawline (p1,p2);
-delay(2000);
-cleardevice();
-
-delay(2000);
-p1=lc.setcode(p1);
-p2=lc.setcode(p2);
-v=lc.visibility(p1,p2);
-delay(2000);
-
-switch(v)
-{
-case 0: lc.drawwindow();
-delay(2000);
-lc.drawline(p1,p2);
-break;
-case 1:lc.drawwindow();
-delay(2000);
-break;
-case 2:p3=lc.resetendpt(p1,p2);
-p4=lc.resetendpt(p2,p1);
-lc.drawwindow();
-delay(2000);
-lc.drawline(p3,p4);
-break;
-
-}
-delay(2000);
-closegraph();
-}
-
-void Lineclip::drawwindow()
-{
-line(150,100,450,100);
-line(450,100,450,350);
-line(450,350,150,350);
-line(150,350,150,100);
-
-}
-
-void Lineclip::drawline(Coordinate p1,Coordinate p2)
-{
-line(p1.x,p1.y,p2.x,p2.y);
-}
-
-Coordinate Lineclip::setcode(Coordinate p)
-
-{
-Coordinate ptemp;
-
-if(p.y<100)
-ptemp.code[0]='1';
-else
-ptemp.code[0]='0';
-
-if(p.y>350)
-ptemp.code[1]='1';
-else
-ptemp.code[1]='0';
-
-if(p.x>450)
-ptemp.code[2]='1';
-else
-ptemp.code[2]='0';
-
-if(p.x<150)
-ptemp.code[3]='1';
-else
-ptemp.code[3]='0';
-
-ptemp.x=p.x;
-ptemp.y=p.y;
-
-return(ptemp);
-
-};
-
-int Lineclip:: visibility(Coordinate p1,Coordinate p2)
-{
-int i,flag=0;
-
-for(i=0;i<4;i++)
-{
-
-if(p1.code[i]!='0' || (p2.code[i]=='1'))
-flag='0';
-}
-
-if(flag==0)
-return(0);
-
-for(i=0;i<4;i++)
-{
-if(p1.code[i]==p2.code[i] && (p2.code[i]=='1'))
-flag='0';
-}
-
-if(flag==0)
-return(1);
-
-return(2);
-}
-
-Coordinate Lineclip::resetendpt(Coordinate p1,Coordinate p2)
-{
-Coordinate temp;
-int x,y,i;
-float m,k;
-
-if(p1.code[3]=='1')
-x=150;
-if(p1.code[2]=='1')
-x=450;
-
-if((p1.code[3]=='1') || (p1.code[2])=='1')
-{
-
-m=(float)(p2.y-p1.y)/(p2.x-p1.x);
-k=(p1.y+(m*(x-p1.x)));
-temp.y=k;
-temp.x=x;
-
-for(i=0;i<4;i++)
-temp.code[i]=p1.code[i];
-
-if(temp.y<=350 && temp.y>=100)
-return (temp);
-}
-
-if(p1.code[0]=='1')
-y=100;
-if(p1.code[1]=='1')
-y=350;
-if((p1.code[1]=='1') || (p1.code[1]=='1'))
-{
-m=(float)(p2.y-p1.y)/(p2.x-p1.x);
-k=(float)p1.x+(float)(y-p1.y)/m;
-temp.x=k;
-temp.y=y;
-
-for(i=0;i<4;i++)
-temp.code[i]=p1.code[i];
-
-return(temp);
-
-}
-else
-return(p1);
-
+#include<iostream>  
+#include<graphics.h>  
+#include<math.h>  
+ 
+using namespace std;  
+ 
+void drawcircle(int xc, int yc, int r)  
+{  
+    int d=3-2*r;  
+     
+    int x=0;  
+    int y=r;  
+ 
+    while (y >= x)  
+    {  
+        putpixel(xc+x,yc+y,15);  
+        putpixel(xc+y,yc+x,15);  
+        putpixel(xc+y,yc-x,15);  
+        putpixel(xc+x,yc-y,15);  
+        putpixel(xc-x,yc-y,15);  
+        putpixel(xc-y,yc-x,15);  
+        putpixel(xc-y,yc+x,15);  
+        putpixel(xc-x,yc+y,15);  
+        x++;  
+  
+        if (d>0)  
+        {  
+            y--;  
+            d=d+4*(x-y)+10;  
+        }  
+        else  
+        {  
+            d=d+4*x+6;  
+        }  
+         
+        delay(10);  
+    }  
+}  
+ 
+void drawline(float x1,float y1,float x2,float y2)  
+{  
+    float dx,dy,steps,x,y,xinc,yinc;  
+     
+    dx=abs(x2-x1);  
+    dy=abs(y2-y1);  
+  
+    if(dx>dy)  
+  steps=dx;  
+    else  
+  steps=dy;  
+     
+    xinc=(x2-x1)/steps;  
+    yinc=(y2-y1)/steps;  
+     
+    x=x1;  
+    y=y1;  
+     
+    putpixel(round(x),round(y),15);  
+     
+    for(int k=0;k<steps;k++)  
+    {  
+   x=x+xinc;  
+   y=y+yinc;  
+        putpixel(round(x),round(y),15);  
+    }  
+}  
+ 
+ 
+int main()  
+{  
+    int gd=DETECT, gm;  
+    initgraph(&gd,&gm,NULL);  
+ 
+    int x,y,r;  
+    float x1,y1,x2,y2,x3;  
+ 
+    cout<<"ENTER COORDINATES  : ";  
+    cout<<"X1 : ";  
+    cin>>x1;  
+    cout<<"Y1 : ";  
+    cin>>y1;  
+    cout<<"X2 : ";  
+    cin>>x2;  
+ x3=(x2+x1)/2; // x-coordinate of Third point of tringle  
+   // x3=(x2-x1)/2+x1;     
+ 
+    y2=y1-sqrt(pow((x2-x1),2)-pow((x2-x1)/2,2));    // y-coordinate of Third point of 
+tringle  
+ 
+    drawline(x1,y1,x2,y1);  
+    drawline(x2,y1,x3,y2);  
+    drawline(x1,y1,x3,y2);  
+ 
+    x=x3;                     // x-coordinate of center of a circle  
+    y=y2+2*(y1-y2)/3;         // y-coordinate of center of a circle  
+ 
+    r=(y1-y2)/3;             //Radius of inner circle  
+    drawcircle(x,y,r);  
+ 
+    r=2*(y1-y2)/3;           //Radius of outer circle  
+    drawcircle(x,y,r);  
+  
+    delay(50000);  
+    closegraph();  
+    return 0;  
 }
